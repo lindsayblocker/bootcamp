@@ -1,14 +1,16 @@
-table,
-td,
-th {
-    border: 1px solid black;
+.button {
+    background-color: #0000002d;
+    color: #000000f5;
+    width: 40%;
+    height: 200px;
+    margin-left: 30%;
+    margin-right: 30%;
+    text-align: center;
+    line-height: 200px;
 }
 
-table {
-    border-collapse: collapse;
-}
-
-td,
-th {
-    padding: 10px;
+body {
+    text-align: center;
+    margin-top: 10%;
+    margin-bottom: 40%;
 }
