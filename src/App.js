@@ -16,7 +16,7 @@ class App extends React.Component {
   }
 
   addCard = card => {
-    if (card.back & card.front) {
+  if (card.back && card.front) {
     const cards = this.state.cards.slice().concat(card);
     this.setState({ cards });
   }
