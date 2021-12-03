@@ -1,7 +1,10 @@
 import React from 'react';
 import './CardViewer.css';
 import cards from './CardEditor.css';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import {firebaseConnect, isLoaded, isEmpty} from 'react-redux-firebase';
+import {connect} from 'react-redux';
+import {compose} from 'redux';
 
 class CardViewer extends React.Component {
 
@@ -16,7 +19,7 @@ class CardViewer extends React.Component {
     progressBar = () => {
         console.log('clicked');
     }
-    nextCard = () => {
+    /*nextCard = () => {
         console.log('clicked');
         if (this.state.cardIndex < this.props.cards.length - 1) {
             this.setState({ cardIndex: this.state.cardIndex + 1 })
@@ -31,12 +34,40 @@ class CardViewer extends React.Component {
         } else {
             this.setState({ cardIndex: this.props.cards.length - 1 })
         }
-    };
+    };*/
     
+    nextCard = () => {
+        if (this.state.cardIndex < this.props.cards.length - 1) {
+          this.setState({
+            cardIndex: this.state.cardIndex + 1,
+            displayFront: true,
+          });
+        }
+      };
+    
+      prevCard = () => {
+        if (this.state.cardIndex > 0) {
+          this.setState({
+            cardIndex: this.state.cardIndex - 1,
+            displayFront: true,
+          });
+        }
+      };
+
     flipCard = () => this.setState({ displayFront: !this.state.displayFront});
 
 
     render() {
+
+        if(!isLoaded(this.props.cards))
+        {
+            return<div>Loading...</div>;
+        }
+
+        if (isEmpty(this.props.cards)) {
+            return <div>Page not found!</div>;
+        }
+
         if (this.state.displayFront) {
             return (
                 <div>
@@ -50,7 +81,7 @@ class CardViewer extends React.Component {
                 <button onClick = {this.previousCard}> Previous Card </button>
                 <button onClick = {this.nextCard}> Next Card</button>
                 <hr/>
-                <Link to="/editor">Go to card editor</Link>
+                <Link to="/editor">Go to Card Editor</Link>
                 <hr/>
                 <Link to="/">Return to Homepage</Link>
             </div>
@@ -76,4 +107,30 @@ class CardViewer extends React.Component {
     }
 }
 
-export default CardViewer;
+const mapStateToProps = (state, props) =>
+{
+    console.log(state);
+    const deck = state.firebase.data[props.match.params.deckId];
+    const name = deck && deck.name;
+    const cards = deck && deck.cards;
+    return { cards: cards, name: name };
+}
+
+export default compose(
+    withRouter,
+    firebaseConnect(props => {
+        console.log('props', props);
+        const deckId = props.match.params.deckId;
+        return [{ path: `/flashcards/${deckId}`, storeAs: deckId }];
+    }),
+    connect(mapStateToProps),
+)(CardViewer);
+
+/*export default compose(
+    withRouter,
+    firebaseConnect(props => {
+      const deckId = props.match.params.deckId;
+      return [{ path: `/flashcards/${deckId}`, storeAs: deckId, populates }];
+    }),
+    connect(mapStateToProps),
+  )(CardViewer);*/
